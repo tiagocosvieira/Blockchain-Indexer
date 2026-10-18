@@ -1,9 +1,12 @@
-//import Database from './db'
+import Database from './db'
+import { IndexManager, CollectionIndex } from './interfaces/IndexManager';
+import {Client} from "pg";
 import WebSocket from 'ws';
 import * as dotenv from 'dotenv';
 import { Alchemy, Network } from 'alchemy-sdk';
 import {WebSocketProvider } from 'ethers'
-
+import * as fs from 'fs';
+import yaml from 'js-yaml';
 
 dotenv.config();
 
@@ -56,7 +59,20 @@ export const getProvider = (network: string, apiKey: string): WebSocketProvider 
     return provider; 
 }
 
-/*
-async function getDatabase(postgres: string, dbName:string): Promise<Db>{
-    const client = 
-}*/
+async function getDatabase(PostgresUri: string){
+    const PostgresClient = new Client({
+            connectionString: PostgresUri,
+        });
+    await PostgresClient.connect();
+
+    return PostgresClient;
+}
+
+
+async function createIndex(filePath: string, indexManager: IndexManager): Promise<Array<string>> {
+    const fileContent = fs.readFileSync(filePath, "utf8");
+
+    const collectionIndexes = yaml.load(fileContent) as CollectionIndex[];
+
+    return await indexManager.ensureIndexes(collectionIndexes);
+}

@@ -21,7 +21,7 @@ class Database {
     });
 
     this.pool.on('error', (err) => {
-      console.error('Erro inesperado no cliente ocioso do Postgres', err);
+      console.error('unexpected error in Postgres idle client', err);
     });
   }
 

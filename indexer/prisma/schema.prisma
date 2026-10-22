@@ -1,0 +1,44 @@
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Block {
+  number       BigInt        @id
+  hash         String        @unique
+  parentHash   String
+  timestamp    BigInt
+  transactions Transaction[]
+}
+
+model Transaction {
+  hash        String  @id
+  blockNumber BigInt
+  fromAddress String?
+  toAddress   String?
+  value       String
+
+  block Block @relation(fields: [blockNumber], references: [number])
+
+  @@index([blockNumber])
+}
+
+model Event {
+  id              Int    @id @default(autoincrement())
+  blockNumber     BigInt
+  transactionHash String
+  logIndex        Int
+  contractAddress String
+  eventName       String
+  data            Json
+
+  @@unique([transactionHash, logIndex])
+  @@index([blockNumber])
+  @@index([contractAddress, eventName])
+}
+

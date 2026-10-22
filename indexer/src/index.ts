@@ -1,17 +1,14 @@
-import Database from './db'
-import { IndexManager, CollectionIndex } from './interfaces/IndexManager';
+import Database from './db';
 import {Client} from "pg";
 import WebSocket from 'ws';
 import * as dotenv from 'dotenv';
 import { Alchemy, Network } from 'alchemy-sdk';
 import {WebSocketProvider } from 'ethers'
-import * as fs from 'fs';
-import yaml from 'js-yaml';
 
 dotenv.config();
 
-const NETWORK = process.env.NETWORK || 'eth-sepolia'
-const ALCHEMY_API_KEY = process.env.ALCHEMY_API_KEY 
+const NETWORK = process.env.NETWORK || 'eth-sepolia';
+const ALCHEMY_API_KEY = process.env.ALCHEMY_API_KEY;
 const PING_INTERVAL = 30000;
 const EXPECTED_PONG_BACK= 15000;
 
@@ -68,11 +65,3 @@ async function getDatabase(PostgresUri: string){
     return PostgresClient;
 }
 
-
-async function createIndex(filePath: string, indexManager: IndexManager): Promise<Array<string>> {
-    const fileContent = fs.readFileSync(filePath, "utf8");
-
-    const collectionIndexes = yaml.load(fileContent) as CollectionIndex[];
-
-    return await indexManager.ensureIndexes(collectionIndexes);
-}
